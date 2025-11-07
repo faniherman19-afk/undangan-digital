@@ -54,9 +54,20 @@
         font-size: 1.8em;
         color: #ffe5e5;
         font-weight: 600;
+        min-height: 2em;
       }
       .cover button {
-        display: none;
+        background-color: #fbb1bd;
+        color: #fff;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 25px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: 0.3s;
+      }
+      .cover button:hover {
+        background: #ff99aa;
       }
       @keyframes fadeIn {
         from {
@@ -69,7 +80,7 @@
         }
       }
       .main {
-        display: block;
+        display: none;
         animation: fadeIn 1s ease;
       }
       header {
@@ -197,6 +208,7 @@
         cursor: pointer;
         font-size: 1.3em;
         z-index: 100;
+        display: none;
       }
       #music-btn:hover {
         background: #e16476;
@@ -216,6 +228,11 @@
           font-size: 1.1em;
         }
         .details {
+          font-size: 0.85em;
+        }
+        .button-group button,
+        #rsvp button {
+          padding: 10px 15px;
           font-size: 0.85em;
         }
       }
@@ -345,7 +362,6 @@
     <button id="music-btn" onclick="toggleMusic()">🎵</button>
     <audio id="bgMusic" preload="auto" loop>
       <source src="ChristianBautistaThewayyoulookatme.mp3" type="audio/mpeg" />
-      Browser Anda tidak mendukung elemen audio.
     </audio>
 
     <!-- SALJU -->
@@ -367,38 +383,43 @@
       const musicBtn = document.getElementById("music-btn");
       let isPlaying = false;
 
-      // Tampilkan nama tamu langsung di cover
+      // Nama tamu dengan animasi mengetik
+      function typeGuestName(text, elementId, speed = 100) {
+        const element = document.getElementById(elementId);
+        element.innerText = "";
+        let i = 0;
+        const timer = setInterval(() => {
+          element.innerText += text.charAt(i);
+          i++;
+          if (i >= text.length) clearInterval(timer);
+        }, speed);
+      }
+
       function getGuestName() {
         const urlParams = new URLSearchParams(window.location.search);
         const guest = urlParams.get("nama");
         return guest ? guest : "Tamu Istimewa";
       }
-      document.getElementById(
-        "guest-name"
-      ).innerText = `Halo, ${getGuestName()}!`;
+      typeGuestName(`Halo, ${getGuestName()}!`, "guest-name", 100);
       musicBtn.style.display = "block";
-      playMusic();
 
-      // Musik
-      function playMusic() {
-        bgMusic
-          .play()
-          .then(() => {
-            isPlaying = true;
-            musicBtn.innerText = "⏸️";
-          })
-          .catch(() => {
-            document.body.addEventListener(
-              "click",
-              () => {
-                bgMusic.play();
-                isPlaying = true;
-                musicBtn.innerText = "⏸️";
-              },
-              { once: true }
-            );
-          });
+      // Buka undangan
+      function openInvite() {
+        document.getElementById("cover").style.opacity = "0";
+        setTimeout(() => {
+          document.getElementById("cover").style.display = "none";
+          document.getElementById("main").style.display = "block";
+          bgMusic
+            .play()
+            .then(() => {
+              isPlaying = true;
+              musicBtn.innerText = "⏸️";
+            })
+            .catch(() => {});
+        }, 800);
       }
+
+      // Tombol musik
       function toggleMusic() {
         if (isPlaying) {
           bgMusic.pause();
